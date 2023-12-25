@@ -22,9 +22,10 @@ def main():
     file_extension = '.dat'  
     files_count = 0  # 记录生成的文件数量  
     pool = multiprocessing.Pool()  # 创建进程池  
-    while get_free_space() > 0:  
+    cpu_count = multiprocessing.cpu_count()
+    while get_free_space() > file_size_mb * 1024 and pool._processes < cpu_count*10:  
         print(f"已生成{files_count}个文件，当前剩余空间：{get_free_space()} KB") 
-        for _ in range(multiprocessing.cpu_count()):  # 根据CPU核心数创建相同数量的进程  
+        for _ in range(cpu_count):  # 根据CPU核心数创建相同数量的进程  
             file_name = file_prefix + str(files_count) + file_extension  
             file_path = os.path.join(folder_path, file_name)  
             process = pool.apply_async(generate_random_file, (file_path, file_size_mb))  
