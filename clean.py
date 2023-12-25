@@ -23,7 +23,7 @@ def main():
     files_count = 0  # 记录生成的文件数量  
     pool = multiprocessing.Pool()  # 创建进程池  
     cpu_count = multiprocessing.cpu_count()
-    while get_free_space() > file_size_mb * 1024:
+    while get_free_space() > 256 * 1024:
         print(f"已生成{files_count}个文件，当前剩余空间：{get_free_space()} KB") 
         if len(pool._pool) < cpu_count*10:  
             for _ in range(cpu_count):  # 根据CPU核心数创建相同数量的进程  
