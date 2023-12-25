@@ -23,14 +23,15 @@ def main():
     files_count = 0  # 记录生成的文件数量  
     pool = multiprocessing.Pool()  # 创建进程池  
     cpu_count = multiprocessing.cpu_count()
-    while get_free_space() > file_size_mb * 1024 and pool._processes < cpu_count*10:  
+    while get_free_space() > file_size_mb * 1024:
         print(f"已生成{files_count}个文件，当前剩余空间：{get_free_space()} KB") 
-        for _ in range(cpu_count):  # 根据CPU核心数创建相同数量的进程  
-            file_name = file_prefix + str(files_count) + file_extension  
-            file_path = os.path.join(folder_path, file_name)  
-            process = pool.apply_async(generate_random_file, (file_path, file_size_mb))  
-            files_count += 1  
-        time.sleep(10)  # 每10s检查一次可用空间  
+        if len(pool._pool) < cpu_count*10:  
+            for _ in range(cpu_count):  # 根据CPU核心数创建相同数量的进程  
+                file_name = file_prefix + str(files_count) + file_extension  
+                file_path = os.path.join(folder_path, file_name)  
+                process = pool.apply_async(generate_random_file, (file_path, file_size_mb))  
+                files_count += 1  
+        time.sleep(1)  # 每10s检查一次可用空间  
     print("所有文件生成完毕，剩余空间为零，重启Mac...")  
     subprocess.call(['/usr/sbin/systemctl', 'reboot'])  # 使用systemctl命令重启Mac  
     pool.close()  # 关闭进程池  
